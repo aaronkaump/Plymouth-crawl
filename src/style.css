@@ -1,0 +1,23 @@
+:root { --bg:#0f1115; --panel:#171a21; --line:#2a2f3a; --text:#e8e6e1; --muted:#9aa0aa;
+  --pub:#3fa66b; --cocktail:#b07cff; --bar:#f0a43a; --restaurant:#8fa3b8; --route:#ffd166; }
+* { box-sizing: border-box; }
+html, body { margin:0; height:100%; background:var(--bg); color:var(--text); font:14px/1.4 system-ui, sans-serif; }
+#map { position:fixed; inset:0 0 40vh 0; }
+#panel { position:fixed; left:0; right:0; bottom:0; height:40vh; background:var(--panel); border-top:1px solid var(--line);
+  display:flex; flex-direction:column; padding:10px 16px calc(10px + env(safe-area-inset-bottom)); }
+@media (min-width: 900px) { #map { inset:0 380px 0 0; } #panel { left:auto; top:0; width:380px; height:auto; border-top:0; border-left:1px solid var(--line); } }
+header { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+#stats { color:var(--muted); font-size:12px; }
+#route-info { margin:8px 0; padding:8px 10px; border:1px solid var(--line); border-radius:8px; color:var(--route); min-height:20px; }
+.actions { display:flex; gap:8px; margin-bottom:8px; }
+button { flex:1; background:#232835; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:10px; font:inherit; }
+#list { list-style:none; margin:0; padding:0; overflow:auto; flex:1; }
+#list li { display:flex; gap:10px; align-items:center; padding:8px 4px; border-bottom:1px solid var(--line); cursor:pointer; }
+#list li.sel { background:#232835; }
+.dot { width:10px; height:10px; border-radius:50%; flex:none; }
+.name { flex:1; } .meta { color:var(--muted); font-size:12px; }
+.badge { font-size:11px; padding:1px 6px; border-radius:6px; border:1px solid var(--line); color:var(--muted); white-space:nowrap; }
+.badge.warn { color:#ff8a7a; border-color:#5a2c27; }
+footer { color:var(--muted); font-size:11px; padding-top:6px; } footer a { color:var(--muted); }
+.marker { width:16px; height:16px; border-radius:50%; border:2px solid #0f1115; box-shadow:0 0 0 1px #fff4; cursor:pointer; }
+.marker.sel { box-shadow:0 0 0 3px var(--route); }
