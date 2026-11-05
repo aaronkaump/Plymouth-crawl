@@ -7,15 +7,25 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "fetch:venues": "node scripts/fetch-venues.mjs",
-    "fetch:routes": "node scripts/fetch-routes.mjs",
+    "test": "vitest run",
+    "curate": "node scripts/curate-venues.mjs",
+    "fetch:walks": "node scripts/fetch-walks.mjs",
     "fetch:venues-osm": "node scripts/fetch-venues-osmapi.mjs"
   },
   "devDependencies": {
     "typescript": "~7.0.2",
-    "vite": "^8.3.6"
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
   },
   "dependencies": {
+    "@fontsource/fraunces": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/playfair-display": "^5.3.0",
+    "@fontsource/press-start-2p": "^5.3.0",
+    "@fontsource/uncial-antiqua": "^5.3.0",
+    "@fontsource/vt323": "^5.3.0",
+    "html-to-image": "^1.11.13",
+    "lit-html": "^3.3.3",
     "maplibre-gl": "^6.16.0"
   }
 }
