@@ -1,29 +1,48 @@
-# Plymouth crawl: maps, routing and venues spike
+# Crawl
 
-Throwaway engineering spike for the Plymouth, MI pub crawl demo. It proves out the free data stack:
-real OpenStreetMap venues on a MapLibre map, plus walking routes between them.
+A pub crawl planner for one night in Plymouth, Michigan, built as a demo of agentic
+product development. One phone, two people (Aaron and John), six stops across
+downtown and Historic Old Village, every stop and walk timed, and a postcard at the end.
+No server, no accounts, no location permission, free data only.
+
+The build follows [docs/BUILD-SPEC.md](docs/BUILD-SPEC.md).
 
 ```bash
 npm install
-npm run dev            # http://localhost:5173 (add ?debug to expose window.map)
-npm run fetch:venues   # refresh src/data/venues.json from Overpass (run from a home connection)
-npm run fetch:routes   # refresh src/data/routes.json (walking matrix + sample crawl) from OSRM
+npm run dev        # http://localhost:5173  (add ?demo for the fake clock)
+npm test           # planner and stop-loop tests
+npm run build      # static site in dist/, deployed to GitHub Pages by .github/workflows/pages.yml
 ```
 
-Needs Node 22.18+ (the scripts import `src/osm.ts` directly).
+## Demo at a desk
 
-## What's here
+Open the app with `?demo` (or Menu, Demo mode). The clock jumps to 8:00 pm on a July
+Saturday. Menu, Play the night runs a whole scripted crawl in about four minutes: stops,
+vibe taps, glasses, walks, the Old Village hop and the recap. Tap anywhere to take over.
+Demo nights are stored apart from real ones.
 
-| Piece | Source | Notes |
+## On the iPhone
+
+Open the Pages URL in Safari, Share, Add to Home Screen. After the first load the app,
+fonts, venue data, walking routes and the map tiles for both districts work offline.
+
+## Data
+
+| File | What | Refresh |
 |---|---|---|
-| Base map | [OpenFreeMap](https://openfreemap.org) `dark` style, MapLibre GL 6 | Free, no key, no stated rate limit |
-| Venues | OSM via Overpass (`fetch:venues`), falling back to OSM POIs read from the vector tiles | Snapshot in `src/data/venues.json`; app loads live if the snapshot is empty |
-| Walking routes | FOSSGIS OSRM foot router, `routing.openstreetmap.de/routed-foot` | Matrix precomputed; tap two venues for a live route |
+| `src/data/venues-osm.json` | 38 raw OSM venues with stable ids | `npm run fetch:venues-osm` (main OSM API; run from a home connection) |
+| `src/data/venues.json` | 24 curated venues: vibe, district, short name | `npm run curate` (edit the table in `scripts/curate-venues.mjs`) |
+| `src/data/walks.json` | walk time, distance and line for every pair | `npm run fetch:walks` (FOSSGIS OSRM, about 5 min) |
 
-- `src/osm.ts`: shared venue normalisation (vibe, zone), Overpass fetch, OSRM route/table calls, sample-crawl ordering.
-- `src/main.ts`: the map, venue list, live route and sample crawl.
-- `scripts/venues-from-tiles.mjs`: builds the snapshot from tile POIs when Overpass is unreachable (how the current snapshot was made).
+Map tiles: [OpenFreeMap](https://openfreemap.org) dark style, retinted per vibe at runtime.
+Data © OpenStreetMap contributors (ODbL), credited in the app menu and on the map.
 
-![Live route](docs/spike-live-route.png)
+## Code
 
-Data © OpenStreetMap contributors (ODbL). Attribution is shown in the app.
+- `src/planner.ts`: the pure planner (six stops, Old Village finale, Closest match, alternatives).
+- `src/store.ts`: the night's state and actions, saved to localStorage on every tap.
+- `src/clock.ts`: the one clock; demo mode swaps in a fake one.
+- `src/ui.ts`: every screen as lit-html templates (lit patches in place, so a vibe tap moves nothing).
+- `src/map.ts`: MapLibre map, tint, pins, route. Loaded lazily.
+- `src/demo.ts`: demo mode and the scripted night.
+- `src/photos.ts`: photos in IndexedDB, downscaled to 1600 px.

@@ -2,25 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Plymouth Crawl spike</title>
+    <meta name="theme-color" content="#0F1A14" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Crawl" />
+    <meta name="description" content="Aaron and John's Plymouth pub crawl" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <title>Crawl</title>
   </head>
   <body>
-    <div id="map"></div>
-    <section id="panel">
-      <header>
-        <strong>Plymouth crawl spike</strong>
-        <span id="stats"></span>
-      </header>
-      <div id="route-info">Tap two venues to get a live walking route.</div>
-      <div class="actions">
-        <button id="sample">Show sample crawl</button>
-        <button id="clear">Clear</button>
-      </div>
-      <ul id="list"></ul>
-      <footer>© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · tiles <a href="https://openfreemap.org">OpenFreeMap</a> · routing <a href="https://routing.openstreetmap.de">FOSSGIS OSRM</a></footer>
-    </section>
+    <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
