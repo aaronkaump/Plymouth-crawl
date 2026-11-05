@@ -31,7 +31,7 @@ self.addEventListener('fetch', (e) => {
     // Tiles and glyphs never change for a given URL: cache first. The style JSON: network first.
     const styleOrTileJson = url.pathname.startsWith('/styles/') || url.pathname === '/planet';
     e.respondWith(caches.open(MAP).then(async (c) => {
-      const hit = await c.match(req);
+      const hit = await c.match(req, { ignoreVary: true });
       if (hit && !styleOrTileJson) return hit;
       try {
         const res = await fetch(req);
@@ -46,7 +46,7 @@ self.addEventListener('fetch', (e) => {
   }
   if (url.origin !== location.origin) return;
   e.respondWith(caches.open(APP).then(async (c) => {
-    const hit = await c.match(req, { ignoreSearch: req.mode === 'navigate' });
+    const hit = await c.match(req, { ignoreSearch: req.mode === 'navigate', ignoreVary: true });
     if (hit) return hit;
     if (req.mode === 'navigate') { const shell = await c.match('./'); if (shell) return shell; }
     return fetch(req);

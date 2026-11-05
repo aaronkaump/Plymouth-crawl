@@ -230,7 +230,8 @@ button:disabled { cursor: default; }
 .postcard .sketch { display: block; width: 100%; height: auto; border-radius: 6px; }
 .pc-stop { display: flex; align-items: center; gap: 8px; height: 36px; font-size: 14px; }
 .pc-stop .ph { width: 32px; height: 32px; flex: none; border-radius: 4px; border: 2px solid #FBF5E8; box-shadow: 0 1px 2px rgba(42,30,20,.35); object-fit: cover; }
-.pc-stop .ph.none { border: 1.5px dashed #9C8466; box-shadow: none; display: grid; place-items: center; }
+.pc-stop .ph.none { border: 1.5px dashed #9C8466; box-shadow: none; display: grid; place-items: center; color: #9C8466; }
+.pc-stop .ph.none svg { width: 14px; height: 14px; }
 .pc-stop .t { width: 40px; color: #6B5640; }
 .pc-stop .nm { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pc-stop .m { width: 52px; text-align: right; font-weight: 700; }

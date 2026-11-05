@@ -94,7 +94,9 @@ function setup() {
   const { setupVibe: v, setupShape: shape } = state.ui;
   const p = plan({ vibe: v, shape, crossAt: null, taken: [] });
   return html`<div class="full setup fade vibe-${v}">
-    <div class="big">Crawl</div>
+    <div class="row"><div class="big" style="flex:1">Crawl</div>
+      ${fakeClock() ? html`<span class="demo-tag">Demo ${fmtClock(now())}</span>` : nothing}
+      <button class="icon-btn" aria-label="Menu" @click=${() => setUi({ menuOpen: true })}>${menuIcon}</button></div>
     <div class="sub">Plymouth, Michigan · since 1825 · Aaron and John</div>
     <div class="section-h">Start with</div>
     ${vibeButtons(v)}
@@ -158,10 +160,10 @@ function timeline(n: Night) {
   const open = () => (w ? arrive() : setUi({ view: 'stop' }));
   return html`<div class="scroll">
     ${doneStops.map((s, i) => html`
-      ${i > 0 ? html`<div class="walk-row"><span class="rail"><span></span></span>${mins(s.arrivedAt! - doneStops[i - 1].leftAt!)} min walk</div>` : nothing}
+      ${i > 0 ? html`<div class="walk-row"><span class="rail"><span></span></span>${walkText(s.arrivedAt! - doneStops[i - 1].leftAt!)}</div>` : nothing}
       <div class="done-row"><span class="n">${i + 1}</span>${stamp(venueOf(s).vibe, 20, true)}<span class="nm">${venueOf(s).name}</span><span>Stayed ${mins(s.leftAt! - s.arrivedAt!)} min</span></div>`)}
     ${n.endedAt ? nothing : html`
-      ${doneStops.length ? html`<div class="walk-row"><span class="rail"><span></span></span>${w ? 'walking now' : `${mins(cur.arrivedAt! - doneStops.at(-1)!.leftAt!)} min walk`}</div>` : nothing}
+      ${doneStops.length ? html`<div class="walk-row"><span class="rail"><span></span></span>${w ? 'walking now' : walkText(cur.arrivedAt! - doneStops.at(-1)!.leftAt!)}</div>` : nothing}
       <button class="card now-mini fade vibe-${curV.vibe}" @click=${open} aria-label=${w ? `Open ${curV.name}` : `Open stop ${n.stops.length}, ${curV.name}`}>
         <span class="kicker">${w ? `Walking to stop ${n.stops.length}` : `Now · stop ${n.stops.length}`}${cur.closestMatch ? ' · Closest match' : ''}</span>
         <span class="row">${stamp(curV.vibe, 28)}<span class="vname">${curV.name}</span><span class="timer">${fmtTimer(elapsed)}</span></span>
@@ -339,6 +341,9 @@ function endCard(n: Night) {
   </section></div>`;
 }
 
+/** Timed walk: under 2 minutes reads "next door". */
+const walkText = (ms: number) => (ms < 120000 ? 'next door' : `${mins(ms)} min walk`);
+
 export function totals(n: Night) {
   const first = n.stops[0].arrivedAt!;
   const end = n.endedAt ?? now();
@@ -349,7 +354,7 @@ export function totals(n: Night) {
 function recap(n: Night, hooks: Hooks) {
   const t = totals(n);
   const date = new Date(n.stops[0].arrivedAt!);
-  const when = date.toLocaleDateString('en-US', { month: 'long', weekday: 'long' });
+  const when = `${date.toLocaleDateString('en-US', { month: 'long' })} ${date.toLocaleDateString('en-US', { weekday: 'long' })}`;
   return html`<div class="full recap vibe-${n.vibe}">
     <span class="word" style="flex:none">Crawl</span>
     <div><div class="kick">Back to the village of homes</div><h2>That's the night</h2></div>
@@ -361,7 +366,7 @@ function recap(n: Night, hooks: Hooks) {
           const v = venueOf(s);
           const ph = s.photo ? cachedPhotoUrl(photoKey(n.id, i)) : null;
           return html`
-          ${i > 0 ? html`<div class="pc-walk"><span class="rail"><span></span></span><span class="sp"></span>${mins(s.arrivedAt! - n.stops[i - 1].leftAt!)} min walk${isOldVillageSide(v.district) && !isOldVillageSide(venueOf(n.stops[i - 1]).district) ? ' · up to Old Village' : ''}</div>` : nothing}
+          ${i > 0 ? html`<div class="pc-walk"><span class="rail"><span></span></span><span class="sp"></span>${walkText(s.arrivedAt! - n.stops[i - 1].leftAt!)}${isOldVillageSide(v.district) && !isOldVillageSide(venueOf(n.stops[i - 1]).district) ? ' · up to Old Village' : ''}</div>` : nothing}
           <div class="pc-stop">
             ${ph ? html`<img class="ph" src=${ph} alt="Photo at ${v.name}">` : html`<span class="ph none" role="img" aria-label="No photo at this stop">${camera}</span>`}
             <span class="t">${fmtClock(s.arrivedAt!)}</span>${stamp(v.vibe, 20)}<span class="nm">${v.name}</span>
@@ -369,7 +374,7 @@ function recap(n: Night, hooks: Hooks) {
         })}
       </div>
       <div class="pc-tot"><div><b>${fmtDuration(t.out)}</b><span>out</span></div><div><b>${fmtDuration(t.at)}</b><span>at ${n.stops.length} stops</span></div><div><b>${fmtDuration(t.walking)}</b><span>walking</span></div></div>
-      <span class="sig">Aaron and John · a ${when.split(' ')[1] ?? ''} ${when.split(' ')[0].replace(',', '')}</span>
+      <span class="sig">Aaron and John · a ${when}</span>
     </div>
     <div class="actions">
       <button class="btn" @click=${() => hooks.savePostcard(document.getElementById('postcard')!)}>Save postcard</button>
@@ -389,13 +394,21 @@ function sketch(n: Night) {
   const ox = (W - (x1 - x0) * kx * sc) / 2, oy = (H - (y1 - y0) * sc) / 2;
   const P = (p: [number, number]) => [ox + (p[0] - x0) * kx * sc, H - (oy + (p[1] - y0) * sc)];
   const d = n.stops.slice(1).map((s, i) => walkLine(n.stops[i].venueId, s.venueId).map((p, k) => `${k ? 'L' : 'M'}${P(p).map((z) => z.toFixed(1)).join(' ')}`).join('')).join('');
+  // Downtown stops are next door to each other: fan overlapping markers out sideways with a leader line.
+  const placed: { x: number; y: number; ax: number; ay: number; v: Venue }[] = [];
+  for (const s of n.stops) {
+    const v = venueOf(s);
+    const [ax, ay] = P([v.lon, v.lat]);
+    let x = ax, y = ay, k = 0;
+    while (placed.some((p) => Math.hypot(p.x - x, p.y - y) < 17) && k < 12) { k++; x = ax + (k % 2 ? 1 : -1) * 18 * Math.ceil(k / 2); y = ay; }
+    placed.push({ x, y, ax, ay, v });
+  }
   return svg`<svg class="sketch" viewBox="0 0 ${W} ${H}" role="img" aria-label="Route sketch of the night">
     <rect width="${W}" height="${H}" rx="6" fill="#E7D7B8"/>
     <path d="${d}" fill="none" stroke="#B4531A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    ${n.stops.map((s, i) => {
-      const v = venueOf(s); const [x, y] = P([v.lon, v.lat]);
+    ${placed.map(({ x, y, ax, ay, v }, i) => {
       const col = VIBE[v.vibe].accent;
-      return svg`<circle cx="${x}" cy="${y}" r="8" fill="#2A1E14" stroke="${col}" stroke-width="1.5"/><text x="${x}" y="${y + 3.5}" font-size="10" font-weight="700" text-anchor="middle" fill="${col}">${i + 1}</text>`;
+      return svg`${ax !== x || ay !== y ? svg`<path d="M${ax} ${ay}L${x} ${y}" stroke="#6B5640" stroke-width="1"/>` : nothing}<circle cx="${x}" cy="${y}" r="8" fill="#2A1E14" stroke="${col}" stroke-width="1.5"/><text x="${x}" y="${y + 3.5}" font-size="10" font-weight="700" text-anchor="middle" fill="${col}">${i + 1}</text>`;
     })}
   </svg>`;
 }
